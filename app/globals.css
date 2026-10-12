@@ -4,6 +4,29 @@
   --color-background: #0a0a0f;
   --color-foreground: #f8fafc;
   --font-sans: var(--font-inter);
+  --font-head: var(--font-zs-head);
+  --font-text: var(--font-zs-text);
+}
+
+/* ZS journey palette: dark violet with a bright purple accent. One palette for the whole page. */
+@theme static {
+  --color-zs-ink: #0e0a1e;
+  --color-zs-panel: #1a1233;
+  --color-zs-line: #32275a;
+  --color-zs-text: #f3eeff;
+  --color-zs-mute: #a79fc4;
+  --color-zs-slate: #a79fc4;
+  --color-zs-progress: #6cb6ff;
+  --color-zs-landmark: #b18bff;
+  --color-zs-alert: #ff7a59;
+
+  /* Gradients (light = text and fills on dark, deep = glows, borders, lines) */
+  --zs-grad-light: linear-gradient(105deg, #b18bff 0%, #e08bff 50%, #ff9ac7 100%);
+  --zs-grad-deep: linear-gradient(105deg, #6d3df0 0%, #b04bf0 50%, #ff5e9c 100%);
+  --zs-grad-hot: linear-gradient(105deg, #ff8a5b 0%, #ff5e9c 100%);
+  --zs-grad-hero: linear-gradient(100deg, #ffffff 0%, #e4d8ff 38%, #ffb3dc 100%);
+  --zs-grad-landmark: linear-gradient(135deg, #cdb4ff 0%, #9a6bff 100%);
+  --zs-grad-progress: linear-gradient(135deg, #9bd8ff 0%, #4f8dff 100%);
 }
 
 * {
@@ -361,4 +384,105 @@ body {
   html {
     scroll-behavior: auto;
   }
+}
+
+/* ─── ZS journey page ────────────────────────────────────────────────────── */
+
+:root { interpolate-size: allow-keywords; }
+
+.zs-root {
+  color-scheme: dark;
+  /* soft aurora behind the top of the page */
+  background-image:
+    radial-gradient(52rem 34rem at 6% 0, rgb(139 92 246 / 0.34), transparent 65%),
+    radial-gradient(44rem 30rem at calc(100% - 3rem) 9rem, rgb(236 72 153 / 0.2), transparent 65%),
+    radial-gradient(40rem 26rem at 40% 34rem, rgb(79 141 255 / 0.12), transparent 70%);
+  background-repeat: no-repeat;
+}
+
+/* Gradient text. Put it on the element that holds the text (not on a parent of animated children). */
+.zs-gtext, .zs-gtext-hero, .zs-gtext-hot { -webkit-background-clip: text; background-clip: text; color: transparent; }
+.zs-gtext { background-image: var(--zs-grad-light); }
+.zs-gtext-hero { background-image: var(--zs-grad-hero); }
+.zs-gtext-hot { background-image: var(--zs-grad-hot); }
+
+.zs-btn { background-image: var(--zs-grad-light); color: var(--color-zs-ink); transition: filter 0.2s; }
+.zs-btn:hover { filter: brightness(1.12); }
+
+/* Card with a gradient border */
+.zs-card {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--color-zs-panel), var(--color-zs-panel)) padding-box,
+    var(--zs-grad-deep) border-box;
+}
+
+.zs-glow-hot { background-image: radial-gradient(42rem 28rem at 92% 16rem, rgb(255 122 89 / 0.14), transparent 70%); background-repeat: no-repeat; }
+/* Violet-to-pink wash for the pinned silence section and the offer */
+.zs-tint { background-image: linear-gradient(170deg, rgb(139 92 246 / 0.2) 0%, rgb(236 72 153 / 0.1) 55%, rgb(79 141 255 / 0.1) 100%); }
+/* starts where .zs-tint ends (blue), fades out at the bottom so the next section joins cleanly */
+.zs-tint-end { background-image: linear-gradient(180deg, rgb(79 141 255 / 0.1) 0%, rgb(139 92 246 / 0.22) 40%, rgb(236 72 153 / 0.12) 78%, transparent 100%); }
+.zs-root :focus-visible { outline: 2px solid var(--color-zs-progress); outline-offset: 3px; border-radius: 2px; }
+.zs-root ::selection { background: color-mix(in oklab, var(--color-zs-landmark) 30%, transparent); color: var(--color-zs-text); }
+
+/* One attribute drives every status treatment: color, shape, texture. */
+[data-s="muted"] { --c: var(--color-zs-slate); }
+[data-s="blue"] { --c: var(--color-zs-progress); }
+[data-s="gold"] { --c: var(--color-zs-landmark); }
+[data-s="red"] { --c: var(--color-zs-alert); }
+
+.zs-glyph { display: inline-block; flex: none; width: 0.875rem; height: 0.875rem; background: var(--c); }
+.zs-glyph[data-s="muted"] { background: transparent; border: 2px solid var(--c); border-radius: 50%; }
+.zs-glyph[data-s="blue"] { border-radius: 50%; }
+.zs-glyph[data-s="gold"] { width: 0.7rem; height: 0.7rem; margin: 0.0875rem; rotate: 45deg; border-radius: 2px; }
+.zs-glyph[data-s="red"] { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+
+.zs-chip {
+  display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.1rem 0.7rem;
+  border: 1px solid color-mix(in oklab, var(--c) 45%, transparent); border-radius: 999px;
+  color: var(--c); font-size: 0.8125rem; font-weight: 600; line-height: 1.5;
+}
+.zs-chip .zs-glyph { width: 0.5rem; height: 0.5rem; border-width: 1.5px; }
+.zs-chip .zs-glyph[data-s="gold"] { width: 0.42rem; height: 0.42rem; margin: 0.04rem; }
+
+/* Calendar heatmap tiles */
+.zs-tile { aspect-ratio: 1; border-radius: 2px; background: color-mix(in oklab, var(--color-zs-line) 75%, transparent); }
+.zs-tile[data-s] { background: var(--c); }
+.zs-tile[data-s="blue"] { background: var(--zs-grad-progress); }
+.zs-tile[data-s="gold"] { background: var(--zs-grad-landmark); }
+.zs-tile[data-s="muted"] { background: color-mix(in oklab, var(--c) 55%, transparent); }
+.zs-tile[data-s="gold"] { box-shadow: 0 0 0 1px var(--c), 0 0 18px -2px color-mix(in oklab, var(--c) 70%, transparent); }
+.zs-tile[data-s="red"] {
+  background: repeating-linear-gradient(135deg, #ff8a5b 0 3px, #ff5e9c 3px 6px);
+}
+a.zs-tile { transition: filter 0.2s, outline-offset 0.2s; }
+a.zs-tile:hover, a.zs-tile:focus-visible { filter: brightness(1.35); outline: 2px solid var(--color-zs-text); outline-offset: 2px; z-index: 1; }
+
+/* Timeline entries wake up as the reader's eye line passes them */
+.zs-ev .zs-glyph { opacity: 0.3; scale: 0.7; transition: opacity 0.4s, scale 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.zs-ev[data-reached] .zs-glyph { opacity: 1; scale: 1; }
+
+.zs-mask { overflow: hidden; padding: 0.04em 0 0.12em; margin-bottom: -0.12em; }
+
+@keyframes zs-pop { 0% { opacity: 0; scale: 0.2; } 60% { scale: 1.25; } 100% { opacity: 1; scale: 1; } }
+@keyframes zs-rise { from { translate: 0 105%; } to { translate: 0 0; } }
+@keyframes zs-ring { 0% { scale: 1; opacity: 0.7; } 100% { scale: 2.6; opacity: 0; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .zs-pop { animation: zs-pop 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards; animation-delay: calc(var(--i) * 14ms + 600ms); }
+  .zs-rise { animation: zs-rise 1.1s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+  .zs-pulse::after {
+    content: ""; position: absolute; inset: 0; border-radius: 2px; border: 2px solid var(--color-zs-landmark);
+    animation: zs-ring 2.4s ease-out infinite; animation-delay: 3s; pointer-events: none;
+  }
+  .zs-mail::details-content {
+    block-size: 0; overflow: clip;
+    transition: block-size 0.35s cubic-bezier(0.22, 1, 0.36, 1), content-visibility 0.35s allow-discrete;
+  }
+  .zs-mail[open]::details-content { block-size: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zs-ev .zs-glyph { transition: none; }
+  /* Scroll-lit words are a motion effect: show the whole passage at full strength instead. */
+  .zs-word { opacity: 1 !important; }
 }

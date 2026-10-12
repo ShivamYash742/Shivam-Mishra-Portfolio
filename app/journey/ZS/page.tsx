@@ -1,42 +1,28 @@
+import Chronicle from "./components/Chronicle";
+import Frame from "./components/Frame";
 import Hero from "./components/Hero";
-import Stats from "./components/Stats";
-import Journey from "./components/Journey";
-import Timeline from "./components/Timeline";
-import ChallengeCard from "./components/ChallengeCard";
-import Victory from "./components/Victory";
-import InterviewSection from "./components/InterviewSection";
+import Moments from "./components/Moments";
 import Offer from "./components/Offer";
 import Reflection from "./components/Reflection";
+import Silence from "./components/Silence";
 
 export default function ZSCampusBeatsPage() {
   return (
-    <main className="bg-[#050508] text-white">
-      {/* 1. Hero */}
+    <Frame>
+      <a
+        href="#log"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-sm focus:bg-zs-landmark focus:px-4 focus:py-2 focus:font-semibold focus:text-zs-ink"
+      >
+        Skip to the log
+      </a>
       <Hero />
-
-      {/* 2. Stats Overview */}
-      <Stats />
-
-      {/* 3. Journey visualization */}
-      <Journey />
-
-      {/* 4. Full sticky timeline */}
-      <Timeline />
-
-      {/* 5. Challenge moments */}
-      <ChallengeCard />
-
-      {/* 6. Top Team Victory */}
-      <Victory />
-
-      {/* 7. Interview section */}
-      <InterviewSection />
-
-      {/* 8. Final Offer */}
-      <Offer />
-
-      {/* 9. Reflection */}
-      <Reflection />
-    </main>
+      <main>
+        <Chronicle />
+        <Moments />
+        <Silence />
+        <Offer />
+        <Reflection />
+      </main>
+    </Frame>
   );
 }
