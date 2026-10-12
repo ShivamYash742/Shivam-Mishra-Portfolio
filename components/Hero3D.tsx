@@ -1,7 +1,7 @@
 'use client';
-import { useEffect, useRef, type MutableRefObject, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Stars, Float } from '@react-three/drei';
+import { Stars, Float, PerformanceMonitor } from '@react-three/drei';
 import { useReducedMotion } from 'framer-motion';
 import * as THREE from 'three';
 
@@ -87,7 +87,7 @@ function Ring({
   });
   return (
     <mesh ref={ref} rotation={new THREE.Euler(...rotation)}>
-      <torusGeometry args={[radius, 0.014, 16, 200]} />
+      <torusGeometry args={[radius, 0.014, 8, 128]} />
       <meshBasicMaterial color={color} transparent opacity={opacity} />
     </mesh>
   );
@@ -174,7 +174,7 @@ function Scene() {
 
       {/* Far layer barely moves; near layer moves most */}
       <ParallaxRig pointer={pointer} strength={0.04}>
-        <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={0.5} />
+        <Stars radius={100} depth={50} count={1800} factor={4} saturation={0} fade speed={0.5} />
       </ParallaxRig>
 
       <ParallaxRig pointer={pointer} strength={0.16}>
@@ -213,16 +213,32 @@ function Scene() {
 
 export default function Hero3D() {
   // "demand" renders a single still frame and then stops the loop, so visitors who
-  // ask for reduced motion get the scene without anything moving.
+  // ask for reduced motion get the scene without anything moving. The same trick
+  // stops the GPU working once the hero has scrolled out of view.
   const reduceMotion = useReducedMotion();
+  const wrap = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(true);
+  const [dpr, setDpr] = useState(1.5);
+
+  useEffect(() => {
+    const el = wrap.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), { rootMargin: '120px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <Canvas
-      camera={{ position: [0, 0, 9], fov: 42 }}
-      dpr={[1, 1.75]}
-      frameloop={reduceMotion ? 'demand' : 'always'}
-    >
-      <Scene />
-    </Canvas>
+    <div ref={wrap} className="h-full w-full">
+      <Canvas
+        camera={{ position: [0, 0, 9], fov: 42 }}
+        dpr={dpr}
+        frameloop={reduceMotion || !visible ? 'demand' : 'always'}
+      >
+        {/* On a slow GPU, drop the resolution instead of dropping frames. */}
+        <PerformanceMonitor onDecline={() => setDpr(1)} onIncline={() => setDpr(1.5)} flipflops={3} onFallback={() => setDpr(1)} />
+        <Scene />
+      </Canvas>
+    </div>
   );
 }

@@ -53,9 +53,9 @@ export default function Navigation() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.7, ease: easeOutExpo }}
       className={clsx(
-        'fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300',
+        'fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,box-shadow] duration-300',
         scrolled
-          ? 'bg-[#0a0a0f]/90 backdrop-blur-xl border-b border-white/[0.08] shadow-lg shadow-black/20'
+          ? 'bg-[#0a0a0f]/95 border-b border-white/[0.08] shadow-lg shadow-black/20'
           : 'bg-transparent'
       )}
     >
@@ -133,7 +133,7 @@ export default function Navigation() {
             initial="hidden"
             animate="show"
             exit="hidden"
-            className="md:hidden bg-[#0a0a0f]/95 backdrop-blur-xl border-b border-white/[0.08] overflow-hidden"
+            className="md:hidden bg-[#0a0a0f] border-b border-white/[0.08] overflow-hidden"
           >
             <div className="px-6 py-4 flex flex-col gap-2">
               {navLinks.map((link) => (
