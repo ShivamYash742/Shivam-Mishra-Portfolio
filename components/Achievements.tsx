@@ -8,7 +8,7 @@ import SpotlightCard from './SpotlightCard';
 export default function Achievements() {
   return (
     <section id="achievements" className="py-28 px-6 bg-[#0a0a0f] relative">
-      <div className="absolute right-0 bottom-0 w-[400px] h-[400px] bg-violet-600/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[radial-gradient(closest-side,rgb(124_58_237/0.1),transparent)] pointer-events-none" />
       <div className="max-w-6xl mx-auto">
         <SectionHeader eyebrow="Notable wins" title="Achievements" />
 

@@ -1,42 +1,42 @@
-import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
-import "../../globals.css";
+import type { Metadata, Viewport } from "next";
+import { Anybody, Instrument_Sans } from "next/font/google";
+import { stats } from "./data";
+import { allEvents, TOTAL_DAYS } from "./derive";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-sans",
+// Anybody's width axis lets the numerals run tall and narrow.
+const head = Anybody({
+  variable: "--font-zs-head",
   subsets: ["latin"],
+  axes: ["wdth"],
   display: "swap",
-  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
+const text = Instrument_Sans({
+  variable: "--font-zs-text",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+export const viewport: Viewport = { themeColor: "#0e0a1e", colorScheme: "dark" };
+
+const reschedules = allEvents.filter((e) => e.status === "red").length;
+
 export const metadata: Metadata = {
-  title: "ZS Campus Beats — 125 Days to One Offer | Shivam Mishra",
-  description:
-    "An interactive case study of 125 days navigating ZS Associates' Campus Beats 2026–27 process — from hackathon to PPO. Business Technology Solutions Associate · ₹14.2 LPA.",
-  keywords: [
-    "ZS Associates",
-    "Campus Beats",
-    "PPO",
-    "BTSA",
-    "Shivam Mishra",
-    "MSIT",
-    "Placement Journey",
-  ],
+  title: `ZS Campus Beats — ${TOTAL_DAYS} Days to One Offer | Shivam Mishra`,
+  description: `An interactive case study of ${TOTAL_DAYS} days navigating ${stats.company}' ${stats.campaign} process, from hackathon to PPO. ${stats.role} · ${stats.offer}.`,
+  keywords: ["ZS Associates", "Campus Beats", "PPO", "BTSA", "Shivam Mishra", "MSIT", "Placement Journey"],
   openGraph: {
-    title: "ZS Campus Beats — 125 Days to One Offer",
-    description:
-      "An interactive case study of 125 days, 26 milestones, 3 reschedules, and 1 PPO from ZS Associates.",
+    title: `ZS Campus Beats — ${TOTAL_DAYS} Days to One Offer`,
+    description: `An interactive case study of ${TOTAL_DAYS} days, ${allEvents.length} milestones, ${reschedules} reschedules, and 1 PPO from ${stats.company}.`,
     type: "article",
   },
 };
 
-export default function ZSCampusBeatsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ZSCampusBeatsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`${plusJakartaSans.variable} font-sans`}>
+    <div
+      className={`${head.variable} ${text.variable} zs-root min-h-svh bg-zs-ink font-text text-zs-text antialiased`}
+    >
       {children}
     </div>
   );

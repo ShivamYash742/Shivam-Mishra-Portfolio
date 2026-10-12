@@ -9,7 +9,7 @@ import SpotlightCard from './SpotlightCard';
 export default function Projects() {
   return (
     <section id="projects" className="py-28 px-6 bg-[#0a0a0f] relative">
-      <div className="absolute right-0 top-1/2 w-[400px] h-[400px] bg-cyan-500/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute right-0 top-1/2 w-[500px] h-[500px] bg-[radial-gradient(closest-side,rgb(6_182_212/0.1),transparent)] pointer-events-none" />
       <div className="max-w-6xl mx-auto">
         <SectionHeader eyebrow="What I've built" title="Projects" />
 

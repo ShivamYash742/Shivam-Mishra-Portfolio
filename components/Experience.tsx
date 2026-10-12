@@ -19,7 +19,7 @@ export default function Experience() {
 
   return (
     <section id="experience" className="py-28 px-6 bg-[#0a0a0f] relative">
-      <div className="absolute left-0 top-0 w-[300px] h-[300px] bg-violet-600/5 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute left-0 top-0 w-[420px] h-[420px] bg-[radial-gradient(closest-side,rgb(124_58_237/0.1),transparent)] pointer-events-none" />
       <div className="max-w-4xl mx-auto">
         <SectionHeader eyebrow="Where I've worked" title="Experience" />
 

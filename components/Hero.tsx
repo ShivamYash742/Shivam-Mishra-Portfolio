@@ -11,7 +11,7 @@ import {
   type MotionValue,
   type Variants,
 } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Github, Linkedin, Mail, Phone, ArrowRight, ChevronDown, Sparkles } from 'lucide-react';
 import { profile } from '@/lib/data';
 import { easeOutExpo } from '@/lib/motion';
@@ -27,11 +27,24 @@ const Hero3D = dynamic(() => import('./Hero3D'), {
 });
 
 const socials = [
-  { icon: Github, href: 'https://github.com/shivamyash742', label: 'GitHub' },
-  { icon: Linkedin, href: 'https://linkedin.com/in/shivammishra', label: 'LinkedIn' },
+  { icon: Github, href: profile.github, label: 'GitHub' },
+  { icon: Linkedin, href: profile.linkedin, label: 'LinkedIn' },
   { icon: Mail, href: `mailto:${profile.email}`, label: 'Email' },
   { icon: Phone, href: `tel:${profile.phone}`, label: 'Phone' },
 ] as const;
+
+/** The hero renders a mobile and a desktop layout; only the one that matches should run the 3D scene. */
+function useIsDesktop() {
+  const [desktop, setDesktop] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const update = () => setDesktop(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  return desktop;
+}
 
 function ImageAvatar() {
   return (
@@ -68,9 +81,12 @@ function ImageAvatar() {
 function ThoughtBubble({
   opacity,
   y,
+  inline = false,
 }: {
   opacity?: MotionValue<number>;
   y?: MotionValue<number>;
+  /** Sits in the normal flow above the avatar (mobile) instead of floating over it, so it can't slide under the navbar. */
+  inline?: boolean;
 }) {
   return (
     <motion.div
@@ -78,9 +94,13 @@ function ThoughtBubble({
       initial={{ opacity: 0, y: 10, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: 1.0, duration: 0.6, type: 'spring', stiffness: 100 }}
-      className="absolute left-1/2 -translate-x-1/2 bottom-full mb-20 w-72 z-30 pointer-events-none"
+      className={
+        inline
+          ? 'relative mx-auto mb-16 w-72 max-w-full z-30 pointer-events-none'
+          : 'absolute left-1/2 -translate-x-1/2 bottom-full mb-20 w-72 z-30 pointer-events-none'
+      }
     >
-      <div className="relative bg-white/[0.06] backdrop-blur-xl border border-violet-500/30 rounded-2xl p-5 shadow-[0_8px_40px_rgba(124,58,237,0.25)]">
+      <div className="relative bg-white/[0.06] backdrop-blur-md border border-violet-500/30 rounded-2xl p-5 shadow-[0_8px_40px_rgba(124,58,237,0.25)]">
         <div className="flex items-center gap-2 mb-2">
           <Sparkles size={13} className="text-violet-400" />
           <span className="font-mono text-violet-400 text-[10px] tracking-[0.2em] uppercase">
@@ -218,6 +238,7 @@ function EdgeFades() {
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
+  const desktop = useIsDesktop();
   const { scrollY } = useScroll();
 
   // Scroll-driven values run through a spring so the avatar glides and settles
@@ -240,27 +261,25 @@ export default function Hero() {
   const hintOpacity = useTransform(scrollY, [0, 80], [1, 0], { clamp: true });
 
   return (
-    <>
+    // One #home for the nav and anchor links; the two layouts below are mutually exclusive by breakpoint.
+    <div id="home">
       {/* Mobile: simple static stacked */}
       <section
-        id="home"
         className="lg:hidden min-h-screen bg-[#0a0a0f] relative overflow-hidden flex flex-col items-center justify-center px-6 pt-32 pb-16"
       >
-        <div className="absolute inset-0 opacity-60">
-          <Hero3D />
-        </div>
+        <div className="absolute inset-0 opacity-60">{desktop === false && <Hero3D />}</div>
         <EdgeFades />
-        <div className="absolute top-20 right-0 w-[400px] h-[400px] bg-violet-600/8 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-cyan-500/6 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-[radial-gradient(closest-side,rgb(124_58_237/0.2),transparent)] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[radial-gradient(closest-side,rgb(6_182_212/0.15),transparent)] pointer-events-none" />
 
         <div className="relative z-20 flex flex-col items-center gap-16 w-full">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.9, type: 'spring', stiffness: 80 }}
-            className="relative pt-24"
+            className="relative flex flex-col items-center"
           >
-            <ThoughtBubble />
+            <ThoughtBubble inline />
             <ImageAvatar />
           </motion.div>
           <div className="w-full">
@@ -272,13 +291,12 @@ export default function Hero() {
       {/* Desktop: scrollytelling — height increased so scroll range matches animation range */}
       <section
         ref={sectionRef}
-        id="home"
         className="hidden lg:block relative bg-[#0a0a0f] h-[260vh]"
       >
         <div className="sticky top-0 h-screen w-full overflow-hidden">
           {/* Ambient background glows (stationary) */}
-          <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-violet-600/8 rounded-full blur-[120px] pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-cyan-500/6 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute top-20 right-0 w-[760px] h-[760px] bg-[radial-gradient(closest-side,rgb(124_58_237/0.2),transparent)] pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-[640px] h-[640px] bg-[radial-gradient(closest-side,rgb(6_182_212/0.15),transparent)] pointer-events-none" />
 
           {/* 3D + Image unit — moves together */}
           <motion.div
@@ -293,7 +311,7 @@ export default function Hero() {
                 WebkitMaskImage: 'radial-gradient(circle at center, black 30%, transparent 72%)',
               }}
             >
-              <Hero3D />
+              {desktop && <Hero3D />}
             </div>
 
             {/* Image + bubble — absolute-centered exactly on 3D origin */}
@@ -328,6 +346,6 @@ export default function Hero() {
           </motion.div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
