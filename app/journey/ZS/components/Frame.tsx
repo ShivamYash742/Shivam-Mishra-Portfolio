@@ -12,7 +12,7 @@ export default function Frame({ children }: { children: React.ReactNode }) {
       <motion.div
         aria-hidden="true"
         style={{ scaleX }}
-        className="fixed inset-x-0 top-0 z-50 h-[3px] origin-left bg-linear-to-r from-zs-progress via-zs-landmark to-zs-alert"
+        className="fixed inset-x-0 top-0 z-50 h-[3px] origin-left bg-linear-to-r from-zs-landmark to-zs-progress"
       />
       {children}
     </MotionConfig>
