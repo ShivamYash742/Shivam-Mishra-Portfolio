@@ -17,7 +17,7 @@ const text = Instrument_Sans({
   display: "swap",
 });
 
-export const viewport: Viewport = { themeColor: "#0e0a1e", colorScheme: "dark" };
+export const viewport: Viewport = { themeColor: "#07070a", colorScheme: "dark" };
 
 const reschedules = allEvents.filter((e) => e.status === "red").length;
 

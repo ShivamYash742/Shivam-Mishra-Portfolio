@@ -11,6 +11,7 @@
 //   pdf     optional, file name of a PDF you put in  public/journey/zs/ , e.g. pdf: "offer-letter.pdf"
 //           (or several: pdf: ["a.pdf", "b.pdf"])
 //           shows inside the expander (and as an "Open PDF" link on phones)
+//   featured optional, true = also shown as an artifact frame in its chapter
 //   pdfLabel optional, expander title when there is no email, e.g. "Hackathon certificate"
 // Dates are ISO (YYYY-MM-DD). `stats.startDate` and `stats.endDate` set the calendar range.
 // In text, {days} becomes the total day count and {span} the length of the silence stretch, so numbers never go stale.
@@ -34,16 +35,36 @@ export interface TimelineEvent {
   isOffer?: boolean;
   isChallenge?: boolean;
   isVictory?: boolean;
+  /** Shown as an artifact frame inside its chapter (needs emailData and/or pdf). */
+  featured?: boolean;
   emailData?: EmailData;
   pdf?: string | string[];
   pdfLabel?: string;
+}
+
+export interface Step {
+  label: string;
+  date: string; // ISO
+  note?: string;
+  /** Marks the stretch of silence; drawn larger. */
+  wait?: boolean;
 }
 
 export interface Phase {
   id: string;
   number: string;
   name: string;
+  /** Short name used on the route map. */
+  short: string;
+  /** One line shown under the node on the route map. */
+  line: string;
+  /** Big quote that opens the chapter. */
+  tagline: string;
+  /** Short narrative under the quote. */
+  story: string;
   note?: string;
+  /** Ordered milestones for the stages that draw a progression. */
+  steps?: Step[];
   events: TimelineEvent[];
 }
 
@@ -53,6 +74,7 @@ export const stats = {
   role: "Business Technology Solutions Associate",
   offer: "₹14.2 LPA",
   offerType: "PPO · FTE",
+  offerShort: "BTSA — FTE",
   startDate: "2026-03-17",
   endDate: "2026-07-20", // the offer day: last tile of the calendar
   acceptBy: "2026-07-24",
@@ -63,26 +85,54 @@ export const stats = {
 
 export const copy = {
   hero: {
-    tagline: "one offer.", // the first line, "{n} days,", is counted from stats
-    blurb: "The full log of ZS Associates’ Campus Beats process, from a webinar sign-up to a pre-placement offer:",
+    title: "The Route",
+    lede: "From registration to the final offer.",
+    blurb:
+      "{days} days through registration, awareness, screening, interviews and the final outcome: ZS Associates’ Campus Beats process, from a webinar sign-up to a pre-placement offer.",
     portfolioLink: "Portfolio",
-    cta: "Read the log",
-    calendarHint: "Hover or tab through the calendar. Every lit day is a milestone and links to its entry in the log.",
+    cta: "Follow the route",
   },
-  log: {
-    title: "The full log",
-    intro: "The space between entries grows with the days between them, so waiting looks like waiting.",
+  route: {
+    title: "Seven stops",
+    hint: "Select a stop to jump to its chapter.",
   },
-  moments: {
-    title: "Three stretches didn’t go to plan",
-    intro: "Most of the process ran on schedule. These didn’t, and each one asked for a reset.",
+  hackathon: {
+    // From the official Instruction Manual in public/journey/zs.
+    challenge:
+      "Build a GenAI-powered workflow for a real-world business case as a team, submitted with a short rationale. Then an individual quiz: DBMS and cloud MCQs, a hands-on SQL exercise, and a SQL + Python problem.",
+    facts: [
+      { k: "Team", v: "AlgoRhythm" },
+      { k: "Window", v: "11:00 AM – 8:00 PM IST" },
+      { k: "Team case", v: "120 minutes, timed" },
+      { k: "Submission", v: "By the team captain only" },
+      { k: "Attempts", v: "Single attempt, recorded" },
+    ],
   },
   offer: {
-    title: "The email that ended the wait",
-    story:
-      "ZS finalized its decision with the MSIT TPO on Jul 17. The offer reached me on Jul 20, with the acceptance form due Jul 24.",
+    headline: "PPO received.",
   },
   reflection: {
+    title: "What changed in {days} days?",
+    blocks: [
+      {
+        title: "Waiting",
+        stat: "{span} days",
+        statNote: "of silence after Round 2",
+        body: "After both interview rounds, {span} days passed without a word. Every morning felt like the longest wait. The silence was the hardest part.",
+      },
+      {
+        title: "Resetting",
+        stat: "3 changes",
+        statNote: "to Round 1 in 48 hours",
+        body: "A scoring failure at the hackathon. Three interview reschedules in two days. Each asked for a mental reset and fresh preparation, and each got one.",
+      },
+      {
+        title: "Persistence",
+        stat: "1 offer",
+        statNote: "after {days} days",
+        body: "Uncertainty, preparation, waiting, rescheduling, interviews. Eventually it became my first full-time offer.",
+      },
+    ],
     lines: [
       "This wasn't just a placement process.",
       "It was {days} days of uncertainty,",
@@ -103,14 +153,20 @@ export const copy = {
 
 export const phases: Phase[] = [
   {
-    id: "awareness",
+    id: "registration",
     number: "01",
-    name: "Awareness",
+    name: "Registration",
+    short: "Registration",
+    line: "Signed up for the ZS info session.",
+    tagline: "The first step.",
+    story:
+      "Registered for “Unlock Your Future at ZS”, the Campus Beats info session, a day before it ran. Day 0 of {days}.",
     events: [
       {
         date: "2026-03-17",
         badge: "REGISTERED",
         title: "Webinar Registration",
+        featured: true,
         description: `Registered for "Unlock Your Future at ZS" — Campus Beats info session.`,
         status: "muted",
         emailData: {
@@ -121,10 +177,23 @@ export const phases: Phase[] = [
             "Confirms your registration for the next day's webinar, “Unlock your future at ZS”, with the session details.",
         },
       },
+    ],
+  },
+  {
+    id: "awareness",
+    number: "02",
+    name: "Awareness & Webinar",
+    short: "Webinar",
+    line: "Roles and the selection process, live.",
+    tagline: "Learning the terrain.",
+    story:
+      "The live session covered roles and the selection process. A second invite followed on Mar 26 for anyone who missed it.",
+    events: [
       {
         date: "2026-03-18",
         badge: "ATTENDED",
         title: "Campus Beats Webinar",
+        featured: true,
         description: "Live session covering roles and the selection process.",
         status: "muted",
         emailData: {
@@ -153,8 +222,13 @@ export const phases: Phase[] = [
   },
   {
     id: "hackathon",
-    number: "02",
+    number: "03",
     name: "Hackathon & Screening",
+    short: "Hackathon",
+    line: "Team AlgoRhythm takes the Tech Challenge.",
+    tagline: "The first real test.",
+    story:
+      "Team AlgoRhythm took the Campus Beats Tech Challenge on Apr 25. The Python section hit scoring problems, and the next day came a proctored aptitude assessment.",
     events: [
       {
         date: "2026-04-12",
@@ -174,6 +248,7 @@ export const phases: Phase[] = [
         date: "2026-04-17",
         badge: "CONFIRMED",
         title: "Tech Challenge Registration Confirmed",
+        featured: true,
         description: "Hackathon slot locked in.",
         status: "muted",
         emailData: {
@@ -203,6 +278,7 @@ export const phases: Phase[] = [
         date: "2026-04-23",
         badge: "RECEIVED",
         title: "Platform Walkthrough FAQs",
+        featured: true,
         description: "FAQ document shared after the pre-hackathon platform walkthrough sessions.",
         status: "muted",
         emailData: {
@@ -248,6 +324,7 @@ export const phases: Phase[] = [
         date: "2026-04-25",
         badge: "COMPLETED",
         title: "Hackathon Day",
+        featured: true,
         description:
           "Round 2 (Python assessment) hit scoring issues — ZS extended the deadline and adjusted scoring.",
         status: "gold",
@@ -301,8 +378,19 @@ export const phases: Phase[] = [
   },
   {
     id: "shortlisting",
-    number: "03",
+    number: "04",
     name: "Shortlisting",
+    short: "Shortlist",
+    line: "Confirmed as a Top Team.",
+    tagline: "Confirmed as a Top Team.",
+    story:
+      "The Top Teams list went out on Apr 30. On May 1 the PPO interview track opened and the BTSA application went in. A communication assessment followed, finished on May 10.",
+    steps: [
+      { label: "Challenge", date: "2026-04-25", note: "Tech Challenge and aptitude assessment done" },
+      { label: "Evaluation", date: "2026-04-30", note: "Top Teams list announced" },
+      { label: "Shortlisted", date: "2026-05-01", note: "Confirmed as a Top Team" },
+      { label: "Communication", date: "2026-05-10", note: "Verbal assessment completed" },
+    ],
     events: [
       {
         date: "2026-04-30",
@@ -322,6 +410,7 @@ export const phases: Phase[] = [
         date: "2026-05-01",
         badge: "SHORTLISTED",
         title: "Confirmed as a Top Team",
+        featured: true,
         description: "PPO / PPI interview track opens.",
         status: "gold",
         isVictory: true,
@@ -390,14 +479,20 @@ export const phases: Phase[] = [
   },
   {
     id: "scheduling",
-    number: "04",
+    number: "05",
     name: "Interview Scheduling",
+    short: "Scheduling",
+    line: "Three slot changes in 48 hours.",
+    tagline: "From preparation to execution.",
+    story:
+      "The TPO shared the interview rounds and prep material on May 12. A month later Round 1 was scheduled, then changed three times in 48 hours before the slot finally held.",
     note: "3 changes in 48 hrs",
     events: [
       {
         date: "2026-05-12",
         badge: "SHORTLISTED",
         title: "Shortlisted for Interviews",
+        featured: true,
         description: "MSIT TPO shared interview rounds and prep material.",
         status: "gold",
         emailData: {
@@ -519,6 +614,7 @@ export const phases: Phase[] = [
         time: "EVE",
         badge: "CONFIRMED",
         title: "Final Slot Confirmed",
+        featured: true,
         description:
           "Locked at 3:30–4:30 PM IST — third and final time for R1.",
         status: "gold",
@@ -534,8 +630,20 @@ export const phases: Phase[] = [
   },
   {
     id: "interviews",
-    number: "05",
+    number: "06",
     name: "Interviews",
+    short: "Interviews",
+    line: "Two Case/Tech rounds, then the wait.",
+    tagline: "The test.",
+    story:
+      "Round 1 ran on Jun 18 and Round 2 on Jun 24. A follow-up went out on Jun 30. Then {span} days passed without a word.",
+    steps: [
+      { label: "Round 1", date: "2026-06-18", note: "Case/Tech, after three reschedules" },
+      { label: "Round 2", date: "2026-06-24", note: "Case/Tech, second and final round" },
+      { label: "Follow-up", date: "2026-06-30", note: "Messages sent after Round 2" },
+      { label: "The wait", date: "2026-06-24", note: "ZS finalizes its decision with the TPO on Jul 17", wait: true },
+      { label: "Decision", date: "2026-07-20", note: "The offer arrives" },
+    ],
     events: [
       {
         date: "2026-06-18",
@@ -590,8 +698,13 @@ export const phases: Phase[] = [
   },
   {
     id: "outcome",
-    number: "06",
+    number: "07",
     name: "Outcome",
+    short: "Offer",
+    line: "PPO received. BTSA, FTE.",
+    tagline: "The destination.",
+    story:
+      "ZS finalized its decision with the MSIT TPO on Jul 17. The offer reached me on Jul 20, with the acceptance form due Jul 24.",
     events: [
       {
         date: "2026-07-17",
@@ -612,6 +725,7 @@ export const phases: Phase[] = [
         date: "2026-07-20",
         badge: "★ OFFER",
         title: "PPO Offer Received — BTSA, FTE",
+        featured: true,
         description: "TPO forwarded the offer. Acceptance form due Jul 24.",
         status: "gold",
         isOffer: true,
